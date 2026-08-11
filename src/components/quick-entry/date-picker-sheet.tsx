@@ -64,9 +64,11 @@ export function DatePickerSheet({ open, onOpenChange, value, onSelect }: DatePic
             />
           </div>
 
-          <p className="text-center text-sm text-muted-foreground">
-            {format(new Date(value), "yyyy. MMMM d., EEEE", { locale: hu })}
-          </p>
+          {value && !Number.isNaN(new Date(value).getTime()) && (
+            <p className="text-center text-sm text-muted-foreground">
+              {format(new Date(value), "yyyy. MMMM d., EEEE", { locale: hu })}
+            </p>
+          )}
         </div>
       </SheetContent>
     </Sheet>

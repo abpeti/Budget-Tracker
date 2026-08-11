@@ -1,5 +1,11 @@
 import { useMemo } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  type InfiniteData,
+} from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/contexts/auth-context"
 import type { TransactionDirection } from "@/lib/database.types"
@@ -53,6 +59,90 @@ export function useCreateTransaction() {
       queryClient.invalidateQueries({ queryKey: transactionsKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: frequentCategoriesKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: accountBalancesKey(user?.id) })
+    },
+  })
+}
+
+export interface UpdateTransactionInput {
+  id: string
+  amount?: number
+  account_id?: string
+  to_account_id?: string | null
+  category_id?: string | null
+  occurred_at?: string
+  payee?: string | null
+  note?: string | null
+}
+
+export function useUpdateTransaction() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, ...patch }: UpdateTransactionInput) => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .update(patch)
+        .eq("id", id)
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionsKey(user?.id) })
+      queryClient.invalidateQueries({ queryKey: accountBalancesKey(user?.id) })
+    },
+  })
+}
+
+export interface TransactionFilters {
+  from?: string
+  to?: string
+  accountId?: string | null
+  categoryId?: string | null
+  direction?: TransactionDirection | null
+  search?: string
+}
+
+const PAGE_SIZE = 30
+
+export function useTransactionsInfinite(filters: TransactionFilters) {
+  const { user } = useAuth()
+
+  return useInfiniteQuery<Transaction[], Error, InfiniteData<Transaction[]>, readonly unknown[], number>({
+    queryKey: [...transactionsKey(user?.id), "list", filters],
+    enabled: !!user,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < PAGE_SIZE ? undefined : allPages.length * PAGE_SIZE,
+    queryFn: async ({ pageParam }): Promise<Transaction[]> => {
+      let query = supabase
+        .from("transactions")
+        .select(
+          "id, occurred_at, direction, amount, account_id, to_account_id, category_id, payee, note, created_at"
+        )
+        .order("occurred_at", { ascending: false })
+        .order("created_at", { ascending: false })
+        .range(pageParam, pageParam + PAGE_SIZE - 1)
+
+      if (filters.from) query = query.gte("occurred_at", filters.from)
+      if (filters.to) query = query.lte("occurred_at", filters.to)
+      if (filters.accountId) {
+        query = query.or(
+          `account_id.eq.${filters.accountId},to_account_id.eq.${filters.accountId}`
+        )
+      }
+      if (filters.categoryId) query = query.eq("category_id", filters.categoryId)
+      if (filters.direction) query = query.eq("direction", filters.direction)
+      if (filters.search) {
+        const term = filters.search.replace(/[%,]/g, "")
+        query = query.or(`payee.ilike.%${term}%,note.ilike.%${term}%`)
+      }
+
+      const { data, error } = await query
+      if (error) throw error
+      return data
     },
   })
 }

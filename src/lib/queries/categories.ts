@@ -46,13 +46,15 @@ export function useCategories(options?: { includeArchived?: boolean }) {
 }
 
 /** Fő- és alkategóriák fastruktúrába rendezve, iránytípus szerint szűrve. */
-export function useCategoryTree(kind: CategoryKind) {
-  const { data, ...rest } = useCategories()
+export function useCategoryTree(kind: CategoryKind, options?: { includeArchived?: boolean }) {
+  const { data, ...rest } = useCategories({ includeArchived: options?.includeArchived })
 
   const tree = useMemo<CategoryWithChildren[]>(() => {
     if (!data) return []
     const byKind = data.filter((c) => c.kind === kind)
-    const mains = byKind.filter((c) => c.parent_id === null)
+    const mains = byKind
+      .filter((c) => c.parent_id === null)
+      .sort((a, b) => a.sort_order - b.sort_order)
     return mains.map((main) => ({
       ...main,
       children: byKind
