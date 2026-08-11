@@ -5,6 +5,7 @@ import "./index.css"
 import { App } from "./App.tsx"
 import { ThemeProvider } from "@/contexts/theme-context"
 import { AuthProvider } from "@/contexts/auth-context"
+import { SavePositionProvider } from "@/contexts/save-position-context"
 import { queryClient } from "@/lib/query-client"
 
 createRoot(document.getElementById("root")!).render(
@@ -12,7 +13,9 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <App />
+          <SavePositionProvider>
+            <App />
+          </SavePositionProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

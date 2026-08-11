@@ -38,6 +38,7 @@ export interface Database {
           created_at?: string
         }
         Update: Partial<Database["public"]["Tables"]["accounts"]["Insert"]>
+        Relationships: []
       }
       categories: {
         Row: {
@@ -65,6 +66,7 @@ export interface Database {
           created_at?: string
         }
         Update: Partial<Database["public"]["Tables"]["categories"]["Insert"]>
+        Relationships: []
       }
       transactions: {
         Row: {
@@ -96,6 +98,7 @@ export interface Database {
           updated_at?: string
         }
         Update: Partial<Database["public"]["Tables"]["transactions"]["Insert"]>
+        Relationships: []
       }
       budgets: {
         Row: {
@@ -117,6 +120,7 @@ export interface Database {
           created_at?: string
         }
         Update: Partial<Database["public"]["Tables"]["budgets"]["Insert"]>
+        Relationships: []
       }
       recurring_rules: {
         Row: {
@@ -140,6 +144,7 @@ export interface Database {
           created_at?: string
         }
         Update: Partial<Database["public"]["Tables"]["recurring_rules"]["Insert"]>
+        Relationships: []
       }
     }
     Views: Record<string, never>
