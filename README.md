@@ -3,11 +3,12 @@
 Egyfelhasználós, személyes költségkövető PWA. Részletes termékspecifikáció:
 [koltsegkoveto-specifikacio.md](./koltsegkoveto-specifikacio.md).
 
-**Fejlesztési állapot: 1. fázis — Alapok, kész.**
-Projekt felállítva, Supabase séma migrációkkal, RLS szabályok, automatikus
-kategória-seedelés, email+jelszó auth védett útvonalakkal, alsó navigáció
-csontváza a 4 fő képernyővel (jelenleg placeholder tartalommal). A tényleges
-gyorsrögzítő képernyő a 2. fázisban készül el.
+**Fejlesztési állapot: 2. fázis — A rögzítés, kész.**
+Az app már napi használatra alkalmas: gyorsrögzítő képernyő saját numpaddal,
+kategória-/számla-/dátumválasztóval, gyakori kategória chipekkel, visszavonható
+mentéssel; tranzakciólista szűréssel, végtelen görgetéssel és szerkesztéssel;
+számla- és kategóriakezelő képernyők. A riportok, a `v_*` nézetek és a BI
+hozzáférés a 3. fázisban készülnek el.
 
 ## Technológia
 
@@ -115,7 +116,7 @@ lokális `.env`-ben.
 
 A teljes ütemterv a specifikáció 9. fejezetében. Röviden:
 
-1. **Alapok** — ✅ kész (ez a README ezt az állapotot írja le)
-2. **A rögzítés** — gyorsrögzítő képernyő, tranzakciólista, számla-/kategóriakezelés
+1. **Alapok** — ✅ kész
+2. **A rögzítés** — ✅ kész (ez a README ezt az állapotot írja le)
 3. **Riportok és BI** — `v_*` nézetek, `bi_reader` szerepkör, riportok, CSV export
 4. **Kényelem** — keretfigyelés, ismétlődő tételek, beállítások, PWA polírozás
