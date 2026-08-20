@@ -1,0 +1,9 @@
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# Kliensoldali route-ok (pl. /transactions, /accounts) kiszolgálása
+# az index.html-lel — React Router onnan veszi át az útvonalkezelést.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
