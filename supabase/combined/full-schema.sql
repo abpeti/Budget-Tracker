@@ -421,3 +421,14 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- ===================================================================
+-- 20260820100001_lock_down_seed_function.sql
+-- ===================================================================
+-- A seed_default_categories kizárólag az on_auth_user_created triggeren
+-- keresztül hívódjon (SECURITY DEFINER kontextusban) — ne legyen közvetlenül
+-- hívható PostgREST RPC végpontként, ahol egy authenticated user tetszőleges
+-- p_user_id-t adhatna meg.
+revoke execute on function public.seed_default_categories(uuid) from public;
+revoke execute on function public.seed_default_categories(uuid) from anon;
+revoke execute on function public.seed_default_categories(uuid) from authenticated;
+
