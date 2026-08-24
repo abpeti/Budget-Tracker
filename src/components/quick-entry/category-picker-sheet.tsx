@@ -56,7 +56,10 @@ export function CategoryPickerSheet({
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent className="pb-[env(safe-area-inset-bottom)]">
+      <SheetContent
+        className="pb-[env(safe-area-inset-bottom)]"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <SheetHeader className="flex flex-row items-center gap-2">
           {activeMain && (
             <button
