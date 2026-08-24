@@ -100,7 +100,7 @@ export function QuickEntryPage() {
   const showUndoToast = (id: string) => {
     setToastTxId(id)
     if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current)
-    toastTimerRef.current = window.setTimeout(() => setToastTxId(null), 5000)
+    toastTimerRef.current = window.setTimeout(() => setToastTxId(null), 2500)
   }
 
   const handleUndo = () => {
