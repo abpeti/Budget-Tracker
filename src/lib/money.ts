@@ -4,6 +4,11 @@
 
 const huGroupFormatter = new Intl.NumberFormat("hu-HU", { maximumFractionDigits: 0 })
 
+/** Postgres numeric -> egész fillér, egyetlen kerekítéssel a JSON-határon. */
+export function toCents(amount: number): number {
+  return Math.round(amount * 100)
+}
+
 /** A numpad nyers bevitelét (pl. "12450" vagy "12.5") fillérré (egész szám) alakítja. */
 export function parseAmountInputToCents(raw: string): number {
   const [wholePart, fractionPart = ""] = raw.split(".")

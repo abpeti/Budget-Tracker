@@ -3,17 +3,13 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/contexts/auth-context"
 import { useAccounts } from "@/lib/queries/accounts"
+import { toCents } from "@/lib/money"
 
 interface TxEffectRow {
   direction: "expense" | "income" | "transfer"
   amount: number
   account_id: string
   to_account_id: string | null
-}
-
-/** Postgres numeric -> egész fillér, egyetlen kerekítéssel a JSON-határon. */
-function toCents(amount: number): number {
-  return Math.round(amount * 100)
 }
 
 /**
