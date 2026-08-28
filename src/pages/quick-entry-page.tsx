@@ -22,6 +22,7 @@ import { FrequentCategoryChips } from "@/components/quick-entry/frequent-categor
 import { CategoryPickerSheet } from "@/components/quick-entry/category-picker-sheet"
 import { AccountPickerSheet } from "@/components/quick-entry/account-picker-sheet"
 import { DatePickerSheet } from "@/components/quick-entry/date-picker-sheet"
+import { NoteSheet } from "@/components/quick-entry/note-sheet"
 import { SaveToast } from "@/components/quick-entry/save-toast"
 
 function todayStr() {
@@ -42,12 +43,14 @@ export function QuickEntryPage() {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [selectedToAccount, setSelectedToAccount] = useState<Account | null>(null)
   const [occurredAt, setOccurredAt] = useState(todayStr())
+  const [note, setNote] = useState("")
   const [error, setError] = useState<string | null>(null)
 
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
   const [accountSheetOpen, setAccountSheetOpen] = useState(false)
   const [toAccountSheetOpen, setToAccountSheetOpen] = useState(false)
   const [dateSheetOpen, setDateSheetOpen] = useState(false)
+  const [noteSheetOpen, setNoteSheetOpen] = useState(false)
 
   const [toastTxId, setToastTxId] = useState<string | null>(null)
   const toastTimerRef = useRef<number | null>(null)
@@ -145,6 +148,7 @@ export function QuickEntryPage() {
         to_account_id: direction === "transfer" ? selectedToAccount!.id : null,
         category_id: direction === "transfer" ? null : selectedCategory!.id,
         occurred_at: occurredAt,
+        note: note.trim() || null,
       })
 
       setLastUsedAccountId(selectedAccount.id)
@@ -152,6 +156,7 @@ export function QuickEntryPage() {
 
       setAmountRaw("0")
       setSumParts([])
+      setNote("")
       if (direction !== "transfer") setSelectedCategory(null)
 
       showUndoToast(created.id)
@@ -216,6 +221,15 @@ export function QuickEntryPage() {
               className="min-h-11 rounded-lg px-2 hover:bg-secondary hover:text-foreground"
             >
               {dateLabel(occurredAt)}
+            </button>
+
+            <span aria-hidden="true">·</span>
+            <button
+              type="button"
+              onClick={() => setNoteSheetOpen(true)}
+              className="min-h-11 max-w-40 truncate rounded-lg px-2 hover:bg-secondary hover:text-foreground"
+            >
+              {note ? note : "+ Megjegyzés"}
             </button>
           </div>
         </div>
@@ -290,6 +304,13 @@ export function QuickEntryPage() {
         onOpenChange={setDateSheetOpen}
         value={occurredAt}
         onSelect={setOccurredAt}
+      />
+
+      <NoteSheet
+        open={noteSheetOpen}
+        onOpenChange={setNoteSheetOpen}
+        value={note}
+        onSave={setNote}
       />
 
       {toastTxId && (
