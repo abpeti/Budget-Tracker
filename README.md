@@ -1,22 +1,28 @@
 # Költségkövető
 
-Egyfelhasználós, személyes költségkövető PWA. Részletes termékspecifikáció:
-[koltsegkoveto-specifikacio.md](./koltsegkoveto-specifikacio.md).
+Egyfelhasználós, személyes költségkövető PWA. Gyors, numpad-alapú
+tranzakció-rögzítés, számla- és kategóriakezelés, riportok — mobilra
+optimalizálva, telefonra telepíthető alkalmazásként is.
 
-**Fejlesztési állapot: 2. fázis — A rögzítés, kész.**
-Az app már napi használatra alkalmas: gyorsrögzítő képernyő saját numpaddal,
-kategória-/számla-/dátumválasztóval, gyakori kategória chipekkel, visszavonható
-mentéssel; tranzakciólista szűréssel, végtelen görgetéssel és szerkesztéssel;
-számla- és kategóriakezelő képernyők. A riportok, a `v_*` nézetek és a BI
-hozzáférés a 3. fázisban készülnek el.
+Részletes termékspecifikáció: [koltsegkoveto-specifikacio.md](./koltsegkoveto-specifikacio.md).
+
+## Képernyők
+
+| Gyorsrögzítés | Tranzakciók | Riportok |
+|---|---|---|
+| ![Gyorsrögzítés](docs/screenshots/quick-entry.png) | ![Tranzakciók](docs/screenshots/transactions.png) | ![Riportok](docs/screenshots/reports.png) |
+
+| Számlák | Kategóriák | Beállítások |
+|---|---|---|
+| ![Számlák](docs/screenshots/accounts.png) | ![Kategóriák](docs/screenshots/categories.png) | ![Beállítások](docs/screenshots/settings.png) |
 
 ## Technológia
 
-React 19 + TypeScript + Vite · Tailwind CSS v4 · shadcn/ui (kézzel felvett
-komponensek) · React Router · Supabase (`@supabase/supabase-js`) · TanStack
-Query · react-hook-form + zod · date-fns · vite-plugin-pwa.
+React 19 + TypeScript + Vite · Tailwind CSS v4 · shadcn/ui · React Router
+· Supabase (Postgres + Auth, Row Level Security) · TanStack Query ·
+react-hook-form + zod · date-fns · vite-plugin-pwa.
 
-## Helyi fejlesztés indítása
+## Helyi fejlesztés
 
 ```bash
 npm install
@@ -44,79 +50,31 @@ VITE_SUPABASE_ANON_KEY=eyJ...
 Csak az **anon** (public) kulcs kerülhet ide. A `service_role` kulcs sosem
 kerülhet a frontendbe vagy verziókezelésbe — az adatbiztonságot a Postgres
 Row Level Security (RLS) szabályok adják, `user_id = auth.uid()` alapon.
-
 Mindkét érték a Supabase projekt **Settings → API** oldalán található.
 
-## Supabase projekt felállítása lépésről lépésre
+## Supabase projekt felállítása
 
-1. **Hozz létre egy új Supabase projektet** a [supabase.com](https://supabase.com)
-   konzolon (Postgres 15+).
-
-2. **Futtasd le a migrációkat.** A `supabase/migrations` mappa tartalmazza a
-   teljes sémát (számlák, kategóriák, tranzakciók, keretek, ismétlődő
-   szabályok, RLS szabályok, automatikus kategória-seedelés). Két lehetőség:
-
-   **a) Supabase CLI-vel (ajánlott):**
+1. Hozz létre egy új Supabase projektet a [supabase.com](https://supabase.com)
+   konzolon.
+2. Futtasd le a migrációkat a `supabase/migrations` mappából:
    ```bash
    npx supabase login
    npx supabase link --project-ref <a-projekted-ref-je>
    npx supabase db push
    ```
-
-   **b) Kézzel, az SQL Editorban:** nyisd meg a Supabase konzol SQL Editorát,
-   és futtasd le a `supabase/migrations` mappa fájljait **név szerinti
-   sorrendben** (a fájlnevek időbélyeggel kezdődnek, ez adja a sorrendet).
-
-3. **Tiltsd le a publikus regisztrációt.** Authentication → Providers → Email
-   → kapcsold ki az "Allow new users to sign up" opciót. Ez egy egyfelhasználós
-   app — a regisztrációs felület szándékosan nem létezik a UI-ban sem.
-
-4. **Hozd létre az egyetlen felhasználót kézzel.** Authentication → Users →
-   "Add user" → "Create new user". Add meg az email címed és egy jelszót,
-   és pipáld be az "Auto Confirm User" opciót (nincs email-visszaigazolási
-   flow). A user létrehozásakor egy adatbázis-trigger (`on_auth_user_created`)
-   automatikusan létrehozza a magyar alapkategória-készletet
-   (Élelmiszer, Lakhatás, Közlekedés, stb. alkategóriákkal) — nincs szükség
-   külön seed script futtatására.
-
-5. **Másold ki a projekt URL-t és anon kulcsot** (Settings → API) a `.env`
-   fájlba.
-
-6. **Jelentkezz be** a most létrehozott email/jelszó párral az app
-   `/login` oldalán.
-
-### Séma áttekintés
-
-| Tábla | Tartalom |
-|---|---|
-| `accounts` | Számlák (készpénz, bank, kártya, stb.), az egyenleg számított érték |
-| `categories` | Kategóriák, pontosan két szint (fő- és alkategória), adatbázis-szinten kikényszerítve |
-| `transactions` | Tranzakciók (kiadás/bevétel/átvezetés), az összeg mindig pozitív, az irányt a `direction` mező hordozza |
-| `budgets` | Havi keretek főkategóriánként |
-| `recurring_rules` | Ismétlődő tételek sablonjai (UI a 4. fázisban) |
-
-A riportokhoz és a BI hozzáféréshez szükséges `v_*` nézetek és a `bi_reader`
-szerepkör a 3. fázisban készülnek el, a specifikáció 3.6 és 7. fejezete
-szerint.
+   (vagy kézzel, az SQL Editorban, a fájlokat név szerinti sorrendben.)
+3. **Tiltsd le a publikus regisztrációt** — Authentication → Providers →
+   Email → kapcsold ki az "Allow new users to sign up" opciót. Ez egy
+   egyfelhasználós app, a regisztrációs felület szándékosan nem létezik.
+4. **Hozd létre az egyetlen felhasználót kézzel** — Authentication → Users
+   → "Add user", pipáld be az "Auto Confirm User" opciót. Egy adatbázis-
+   trigger automatikusan létrehozza a magyar alapkategória-készletet.
+5. Másold ki a projekt URL-t és anon kulcsot (Settings → API) a `.env`
+   fájlba, majd jelentkezz be a `/login` oldalon.
 
 ## Deploy
 
 A build statikus kimenet (`dist/`), ezért bármelyik statikus hosting
-megfelel:
-
-- **Vercel:** `vercel --prod` vagy GitHub-integráció, build parancs
-  `npm run build`, kimeneti mappa `dist`.
-- **Cloudflare Pages:** build parancs `npm run build`, kimeneti mappa `dist`.
-
-A környezeti változókat (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) a
-hosting felületén kell beállítani, ugyanazokkal az értékekkel, mint a
-lokális `.env`-ben.
-
-## Fejlesztési fázisok
-
-A teljes ütemterv a specifikáció 9. fejezetében. Röviden:
-
-1. **Alapok** — ✅ kész
-2. **A rögzítés** — ✅ kész (ez a README ezt az állapotot írja le)
-3. **Riportok és BI** — `v_*` nézetek, `bi_reader` szerepkör, riportok, CSV export
-4. **Kényelem** — keretfigyelés, ismétlődő tételek, beállítások, PWA polírozás
+megfelel (Vercel, Cloudflare Pages, stb.), build parancs `npm run build`,
+kimeneti mappa `dist`. A környezeti változókat a hosting felületén kell
+beállítani, ugyanazokkal az értékekkel, mint a lokális `.env`-ben.
