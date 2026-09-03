@@ -4,7 +4,11 @@ import { hu } from "date-fns/locale"
 import type { TransactionDirection } from "@/lib/database.types"
 import { useAccounts, type Account } from "@/lib/queries/accounts"
 import { useCategories, type Category } from "@/lib/queries/categories"
-import { useCreateTransaction, useDeleteTransaction } from "@/lib/queries/transactions"
+import {
+  useCategoryAccountSuggestions,
+  useCreateTransaction,
+  useDeleteTransaction,
+} from "@/lib/queries/transactions"
 import { getLastUsedAccountId, setLastUsedAccountId } from "@/lib/last-used-account"
 import {
   appendDecimalPoint,
@@ -32,6 +36,7 @@ function todayStr() {
 export function QuickEntryPage() {
   const { data: accounts } = useAccounts()
   const { data: allCategories } = useCategories()
+  const { data: categoryAccountSuggestions } = useCategoryAccountSuggestions()
   const createTransaction = useCreateTransaction()
   const deleteTransaction = useDeleteTransaction()
   const { savePosition } = useSavePosition()
@@ -42,6 +47,7 @@ export function QuickEntryPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [selectedToAccount, setSelectedToAccount] = useState<Account | null>(null)
+  const [accountTouched, setAccountTouched] = useState(false)
   const [occurredAt, setOccurredAt] = useState(todayStr())
   const [note, setNote] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -96,6 +102,20 @@ export function QuickEntryPage() {
       setSelectedToAccount(null)
       setSelectedCategory((prev) => (prev && prev.kind !== next ? null : prev))
     }
+  }
+
+  const handleSelectCategory = (cat: Category | null) => {
+    setSelectedCategory(cat)
+    if (cat && !accountTouched && accounts) {
+      const suggestedId = categoryAccountSuggestions?.get(cat.id)
+      const match = suggestedId ? accounts.find((a) => a.id === suggestedId) : undefined
+      if (match) setSelectedAccount(match)
+    }
+  }
+
+  const handleSelectAccount = (account: Account) => {
+    setSelectedAccount(account)
+    setAccountTouched(true)
   }
 
   const sumTotal = sumParts.reduce((a, b) => a + b, 0)
@@ -157,7 +177,10 @@ export function QuickEntryPage() {
       setAmountRaw("0")
       setSumParts([])
       setNote("")
-      if (direction !== "transfer") setSelectedCategory(null)
+      if (direction !== "transfer") {
+        setSelectedCategory(null)
+        setAccountTouched(false)
+      }
 
       showUndoToast(created.id)
     } catch (err) {
@@ -246,7 +269,7 @@ export function QuickEntryPage() {
           <FrequentCategoryChips
             kind={direction}
             selectedId={selectedCategory?.id ?? null}
-            onSelect={setSelectedCategory}
+            onSelect={handleSelectCategory}
           />
         )}
 
@@ -276,7 +299,7 @@ export function QuickEntryPage() {
           open={categorySheetOpen}
           onOpenChange={setCategorySheetOpen}
           kind={direction}
-          onSelect={setSelectedCategory}
+          onSelect={handleSelectCategory}
         />
       )}
 
@@ -284,7 +307,7 @@ export function QuickEntryPage() {
         open={accountSheetOpen}
         onOpenChange={setAccountSheetOpen}
         value={selectedAccount?.id ?? null}
-        onSelect={setSelectedAccount}
+        onSelect={handleSelectAccount}
         excludeId={direction === "transfer" ? selectedToAccount?.id : undefined}
       />
 

@@ -28,6 +28,8 @@ const frequentCategoriesKey = (userId: string | undefined) =>
   ["frequent-categories", userId] as const
 const accountBalancesKey = (userId: string | undefined) =>
   ["account-balances", userId] as const
+const categoryAccountSuggestionsKey = (userId: string | undefined) =>
+  ["category-account-suggestions", userId] as const
 
 export interface NewTransactionInput {
   direction: TransactionDirection
@@ -59,6 +61,7 @@ export function useCreateTransaction() {
       queryClient.invalidateQueries({ queryKey: transactionsKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: frequentCategoriesKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: accountBalancesKey(user?.id) })
+      queryClient.invalidateQueries({ queryKey: categoryAccountSuggestionsKey(user?.id) })
     },
   })
 }
@@ -92,6 +95,7 @@ export function useUpdateTransaction() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionsKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: accountBalancesKey(user?.id) })
+      queryClient.invalidateQueries({ queryKey: categoryAccountSuggestionsKey(user?.id) })
     },
   })
 }
@@ -160,6 +164,7 @@ export function useDeleteTransaction() {
       queryClient.invalidateQueries({ queryKey: transactionsKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: frequentCategoriesKey(user?.id) })
       queryClient.invalidateQueries({ queryKey: accountBalancesKey(user?.id) })
+      queryClient.invalidateQueries({ queryKey: categoryAccountSuggestionsKey(user?.id) })
     },
   })
 }
@@ -199,4 +204,45 @@ export function useFrequentCategoryIds(limit = 8) {
   const ids = useMemo(() => query.data?.slice(0, limit) ?? [], [query.data, limit])
 
   return { ...query, ids }
+}
+
+/** Kategóriánként a legtöbbször használt számla azonosítója, a teljes tranzakciótörténet alapján. */
+export function useCategoryAccountSuggestions() {
+  const { user } = useAuth()
+
+  return useQuery({
+    queryKey: categoryAccountSuggestionsKey(user?.id),
+    enabled: !!user,
+    queryFn: async (): Promise<Map<string, string>> => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("category_id, account_id")
+        .not("category_id", "is", null)
+
+      if (error) throw error
+
+      const counts = new Map<string, Map<string, number>>()
+      for (const row of data) {
+        const categoryId = row.category_id as string
+        const accountCounts = counts.get(categoryId) ?? new Map<string, number>()
+        accountCounts.set(row.account_id, (accountCounts.get(row.account_id) ?? 0) + 1)
+        counts.set(categoryId, accountCounts)
+      }
+
+      const suggestions = new Map<string, string>()
+      for (const [categoryId, accountCounts] of counts) {
+        let bestAccountId: string | null = null
+        let bestCount = 0
+        for (const [accountId, count] of accountCounts) {
+          if (count > bestCount) {
+            bestCount = count
+            bestAccountId = accountId
+          }
+        }
+        if (bestAccountId) suggestions.set(categoryId, bestAccountId)
+      }
+
+      return suggestions
+    },
+  })
 }
