@@ -7,6 +7,7 @@ import { TransactionsPage } from "@/pages/transactions-page"
 import { ReportsPage } from "@/pages/reports-page"
 import { AccountsPage } from "@/pages/accounts-page"
 import { CategoriesPage } from "@/pages/categories-page"
+import { RecurringPage } from "@/pages/recurring-page"
 import { SettingsPage } from "@/pages/settings-page"
 
 export function App() {
@@ -27,6 +28,7 @@ export function App() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/recurring" element={<RecurringPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>

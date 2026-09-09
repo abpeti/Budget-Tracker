@@ -5,7 +5,18 @@
 export type AccountType = "cash" | "bank" | "card" | "savings" | "credit" | "other"
 export type CategoryKind = "expense" | "income"
 export type TransactionDirection = "expense" | "income" | "transfer"
-export type RecurringFrequency = "monthly" | "weekly" | "yearly"
+export type RecurringFrequency = "daily" | "weekly" | "monthly" | "yearly"
+
+/** A recurring_rules.template jsonb tartalma — egy tranzakció "sablonja". */
+export interface RecurringTemplate {
+  direction: TransactionDirection
+  amount: number
+  account_id: string
+  to_account_id?: string | null
+  category_id?: string | null
+  payee?: string | null
+  note?: string | null
+}
 
 export interface Database {
   public: {
@@ -80,6 +91,7 @@ export interface Database {
           category_id: string | null
           payee: string | null
           note: string | null
+          source_rule_id: string | null
           created_at: string
           updated_at: string
         }
@@ -94,6 +106,7 @@ export interface Database {
           category_id?: string | null
           payee?: string | null
           note?: string | null
+          source_rule_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -126,20 +139,28 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          template: Record<string, unknown>
+          name: string | null
+          template: RecurringTemplate
           frequency: RecurringFrequency
+          interval_count: number
           day_of_period: number
           next_run: string
+          end_date: string | null
+          last_run: string | null
           is_active: boolean
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          template: Record<string, unknown>
+          name?: string | null
+          template: RecurringTemplate
           frequency: RecurringFrequency
+          interval_count?: number
           day_of_period: number
           next_run: string
+          end_date?: string | null
+          last_run?: string | null
           is_active?: boolean
           created_at?: string
         }

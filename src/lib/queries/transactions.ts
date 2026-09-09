@@ -31,6 +31,20 @@ const accountBalancesKey = (userId: string | undefined) =>
 const categoryAccountSuggestionsKey = (userId: string | undefined) =>
   ["category-account-suggestions", userId] as const
 
+/**
+ * Minden lekérdezés, amit egy tranzakció létrejötte/törlése elavulttá tesz.
+ * Az ismétlődő tételek modulja is ezen keresztül frissít, hogy ne csússzon szét
+ * a kulcslista két helyen.
+ */
+export function transactionRelatedQueryKeys(userId: string | undefined) {
+  return [
+    transactionsKey(userId),
+    frequentCategoriesKey(userId),
+    accountBalancesKey(userId),
+    categoryAccountSuggestionsKey(userId),
+  ]
+}
+
 export interface NewTransactionInput {
   direction: TransactionDirection
   amount: number

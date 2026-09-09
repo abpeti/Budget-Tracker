@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom"
-import { ChevronRight, Landmark, Shapes } from "lucide-react"
+import { ChevronRight, Landmark, Repeat, Shapes } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
 import { useSavePosition } from "@/contexts/save-position-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useDueRecurringOccurrences } from "@/lib/queries/recurring-rules"
 
 export function SettingsPage() {
   const { user, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const { savePosition, setSavePosition } = useSavePosition()
+  const { occurrences: dueOccurrences } = useDueRecurringOccurrences()
 
   return (
     <div className="flex flex-col gap-4 p-4 pt-8">
@@ -46,6 +48,19 @@ export function SettingsPage() {
           >
             <Shapes className="size-5 text-muted-foreground" aria-hidden="true" />
             <span className="flex-1 font-medium">Kategóriák</span>
+            <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
+          </Link>
+          <Link
+            to="/recurring"
+            className="flex min-h-12 items-center gap-3 rounded-lg px-2 -mx-2 hover:bg-secondary"
+          >
+            <Repeat className="size-5 text-muted-foreground" aria-hidden="true" />
+            <span className="flex-1 font-medium">Ismétlődő tételek</span>
+            {dueOccurrences.length > 0 && (
+              <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
+                {dueOccurrences.length} esedékes
+              </span>
+            )}
             <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
           </Link>
         </CardContent>

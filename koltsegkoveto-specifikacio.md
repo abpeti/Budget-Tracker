@@ -141,18 +141,35 @@ Főkategóriára állítható havi keret. A felhasználás a kategória és öss
 
 ```sql
 create table recurring_rules (
-  id            uuid primary key default gen_random_uuid(),
-  user_id       uuid not null references auth.users(id) on delete cascade,
-  template      jsonb not null,  -- direction, amount, account_id, category_id, payee, note
-  frequency     text not null check (frequency in ('monthly','weekly','yearly')),
-  day_of_period int not null,
-  next_run      date not null,
-  is_active     boolean not null default true,
-  created_at    timestamptz not null default now()
+  id             uuid primary key default gen_random_uuid(),
+  user_id        uuid not null references auth.users(id) on delete cascade,
+  name           text,            -- opcionális megnevezés (pl. "Albérlet")
+  template       jsonb not null,  -- direction, amount, account_id, category_id, payee, note
+  frequency      text not null check (frequency in ('daily','weekly','monthly','yearly')),
+  interval_count int not null default 1 check (interval_count between 1 and 99),
+  day_of_period  int not null,
+  next_run       date not null,
+  end_date       date,            -- null = határozatlan
+  last_run       date,
+  is_active      boolean not null default true,
+  created_at     timestamptz not null default now()
 );
 ```
 
-Csak a 3. fázisban. A generálás **ne** cron legyen: az app indulásakor ellenőrzi, van-e lejárt `next_run`, és felajánlja a rögzítést. Ez egyszerűbb és átláthatóbb, mint egy háttérfolyamat, ami a tudtod nélkül könyvel.
+A `frequency` és az `interval_count` együtt adja ki az ütemezést: `monthly`+1 =
+havonta, `monthly`+3 = negyedévente, `monthly`+6 = félévente, `yearly`+1 = évente,
+`weekly`+2 = kéthetente. A `day_of_period` a horgony: havi/éves ismétlődésnél a
+hónap napja (31 = a hónap utolsó napja a rövidebb hónapokban is), hetinél az ISO
+hétnap. A következő esedékesség mindig a horgonyból számolódik, nem az előző
+dátum eltolásával — így egy február nem csúsztatja el a sorozat többi tagját.
+
+A generált tranzakció a `transactions.source_rule_id` mezőben őrzi, melyik
+szabályból született; ugyanaz a szabály ugyanarra a napra csak egyszer könyvel.
+
+A generálás **ne** cron legyen: az app indulásakor ellenőrzi, van-e lejárt
+`next_run`, és felajánlja a rögzítést. Ez egyszerűbb és átláthatóbb, mint egy
+háttérfolyamat, ami a tudtod nélkül könyvel. Az elmaradt előfordulások
+egyesével jönnek vissza, mindegyik külön rögzíthető vagy kihagyható.
 
 ### 3.6 Nézetek (view-k)
 

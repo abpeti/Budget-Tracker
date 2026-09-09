@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom"
 import { BottomNav } from "./bottom-nav"
+import { DueRecurringSheet } from "@/components/recurring/due-recurring-sheet"
 
 export function AppLayout() {
   return (
@@ -8,6 +9,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <BottomNav />
+      <DueRecurringSheet />
     </div>
   )
 }
