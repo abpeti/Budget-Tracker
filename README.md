@@ -1,21 +1,20 @@
-# Költségkövető
+# Budget Tracker
 
-Egyfelhasználós, személyes költségkövető PWA. Gyors, numpad-alapú
-tranzakció-rögzítés, számla- és kategóriakezelés, riportok — mobilra
-optimalizálva, telefonra telepíthető alkalmazásként is.
+A single-user, personal budget tracking PWA. Fast, numpad-based
+transaction entry, account and category management, reports — optimized
+for mobile, installable on your phone as an app.
 
-Részletes termékspecifikáció: [koltsegkoveto-specifikacio.md](./koltsegkoveto-specifikacio.md).
+Detailed product specification (in Hungarian): [koltsegkoveto-specifikacio.md](./koltsegkoveto-specifikacio.md).
 
-## Képernyők
+## Screens
 
-| Gyorsrögzítés | Tételek | Riportok | Beállítások |
+| Quick Entry | Transactions | Reports | Settings |
 |:---:|:---:|:---:|:---:|
-| <img src="docs/screenshots/quick-entry-light.png" width="200" alt="Gyorsrögzítés"> | <img src="docs/screenshots/transactions-light.png" width="200" alt="Tételek"> | <img src="docs/screenshots/reports-light.png" width="200" alt="Riportok"> | <img src="docs/screenshots/settings-light.png" width="200" alt="Beállítások"> |
-| <img src="docs/screenshots/quick-entry-dark.png" width="200" alt="Gyorsrögzítés – sötét mód"> | <img src="docs/screenshots/transactions-dark.png" width="200" alt="Tételek – sötét mód"> | <img src="docs/screenshots/reports-dark.png" width="200" alt="Riportok – sötét mód"> | <img src="docs/screenshots/settings-dark.png" width="200" alt="Beállítások – sötét mód"> |
+| <img src="docs/screenshots/quick-entry-light.png" width="200" alt="Quick Entry"> | <img src="docs/screenshots/transactions-light.png" width="200" alt="Transactions"> | <img src="docs/screenshots/reports-light.png" width="200" alt="Reports"> | <img src="docs/screenshots/settings-light.png" width="200" alt="Settings"> |
+| <img src="docs/screenshots/quick-entry-dark.png" width="200" alt="Quick Entry – dark mode"> | <img src="docs/screenshots/transactions-dark.png" width="200" alt="Transactions – dark mode"> | <img src="docs/screenshots/reports-dark.png" width="200" alt="Reports – dark mode"> | <img src="docs/screenshots/settings-dark.png" width="200" alt="Settings – dark mode"> |
 
-## Technológia
+## Tech Stack
 
 React 19 + TypeScript + Vite · Tailwind CSS v4 · shadcn/ui · React Router
 · Supabase (Postgres + Auth, Row Level Security) · TanStack Query ·
 react-hook-form + zod · date-fns · vite-plugin-pwa.
-
