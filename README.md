@@ -9,9 +9,9 @@ Részletes termékspecifikáció: [koltsegkoveto-specifikacio.md](./koltsegkovet
 ## Képernyők
 
 | Gyorsrögzítés | Tételek | Riportok | Beállítások |
-|---|---|---|---|
-| ![Gyorsrögzítés](docs/screenshots/quick-entry-light.png) | ![Tételek](docs/screenshots/transactions-light.png) | ![Riportok](docs/screenshots/reports-light.png) | ![Beállítások](docs/screenshots/settings-light.png) |
-| ![Gyorsrögzítés – sötét mód](docs/screenshots/quick-entry-dark.png) | ![Tételek – sötét mód](docs/screenshots/transactions-dark.png) | ![Riportok – sötét mód](docs/screenshots/reports-dark.png) | ![Beállítások – sötét mód](docs/screenshots/settings-dark.png) |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/quick-entry-light.png" width="200" alt="Gyorsrögzítés"> | <img src="docs/screenshots/transactions-light.png" width="200" alt="Tételek"> | <img src="docs/screenshots/reports-light.png" width="200" alt="Riportok"> | <img src="docs/screenshots/settings-light.png" width="200" alt="Beállítások"> |
+| <img src="docs/screenshots/quick-entry-dark.png" width="200" alt="Gyorsrögzítés – sötét mód"> | <img src="docs/screenshots/transactions-dark.png" width="200" alt="Tételek – sötét mód"> | <img src="docs/screenshots/reports-dark.png" width="200" alt="Riportok – sötét mód"> | <img src="docs/screenshots/settings-dark.png" width="200" alt="Beállítások – sötét mód"> |
 
 ## Technológia
 
