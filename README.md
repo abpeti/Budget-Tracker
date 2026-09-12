@@ -8,13 +8,10 @@ Részletes termékspecifikáció: [koltsegkoveto-specifikacio.md](./koltsegkovet
 
 ## Képernyők
 
-| Gyorsrögzítés | Tranzakciók | Riportok |
-|---|---|---|
-| ![Gyorsrögzítés](docs/screenshots/quick-entry.png) | ![Tranzakciók](docs/screenshots/transactions.png) | ![Riportok](docs/screenshots/reports.png) |
-
-| Számlák | Kategóriák | Beállítások |
-|---|---|---|
-| ![Számlák](docs/screenshots/accounts.png) | ![Kategóriák](docs/screenshots/categories.png) | ![Beállítások](docs/screenshots/settings.png) |
+| Gyorsrögzítés | Tételek | Riportok | Beállítások |
+|---|---|---|---|
+| ![Gyorsrögzítés](docs/screenshots/quick-entry-light.png) | ![Tételek](docs/screenshots/transactions-light.png) | ![Riportok](docs/screenshots/reports-light.png) | ![Beállítások](docs/screenshots/settings-light.png) |
+| ![Gyorsrögzítés – sötét mód](docs/screenshots/quick-entry-dark.png) | ![Tételek – sötét mód](docs/screenshots/transactions-dark.png) | ![Riportok – sötét mód](docs/screenshots/reports-dark.png) | ![Beállítások – sötét mód](docs/screenshots/settings-dark.png) |
 
 ## Technológia
 
