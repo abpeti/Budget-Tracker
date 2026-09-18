@@ -1,6 +1,5 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
-import { ArrowDown, ArrowLeft, ArrowUp, Archive, ArchiveRestore, Pencil, Plus, Trash2 } from "lucide-react"
+import { ArrowDown, ArrowUp, Archive, ArchiveRestore, Pencil, Plus, Trash2 } from "lucide-react"
 import { useAccounts, useUpdateAccount, type Account } from "@/lib/queries/accounts"
 import { useAccountBalances } from "@/lib/queries/account-balances"
 import { formatCentsAsHuf } from "@/lib/money"
@@ -20,7 +19,7 @@ const ACCOUNT_TYPE_LABELS: Record<Account["type"], string> = {
 
 export function AccountsPage() {
   const { data: accounts, isLoading } = useAccounts({ includeArchived: true })
-  const { balances, netWorth } = useAccountBalances()
+  const { balances, netWorth, isLoading: balancesLoading } = useAccountBalances()
   const updateAccount = useUpdateAccount()
 
   const [formOpen, setFormOpen] = useState(false)
@@ -66,24 +65,26 @@ export function AccountsPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4 pt-6">
-      <Link
-        to="/settings"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Beállítások
-      </Link>
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">Számlák</h1>
-          <p className="text-sm text-muted-foreground">
-            Összesített vagyon: <span className="tabular-nums">{formatCentsAsHuf(netWorth)}</span>
-          </p>
-        </div>
+        <h1 className="text-lg font-semibold">Számlák</h1>
         <Button type="button" size="icon" onClick={openCreate} aria-label="Új számla">
           <Plus className="size-5" />
         </Button>
       </div>
+
+      <section
+        aria-label="Összvagyon"
+        className="rounded-xl bg-primary px-4 py-5 text-primary-foreground shadow-sm"
+      >
+        <p className="text-sm font-medium opacity-80">Összvagyon</p>
+        <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight">
+          {balancesLoading && !accounts ? "…" : formatCentsAsHuf(netWorth)}
+        </p>
+        <p className="mt-1 text-xs opacity-80">
+          {active.length} aktív számla
+          {archived.length > 0 && ` · ${archived.length} archivált`}
+        </p>
+      </section>
 
       {isLoading && <p className="text-sm text-muted-foreground">Betöltés…</p>}
 

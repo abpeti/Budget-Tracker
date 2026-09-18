@@ -246,7 +246,7 @@ Ez az app szíve. Ezt kell a legjobban megcsinálni.
 | `/categories` | Kategóriafa. Hozzáadás, átnevezés, ikon és szín, archiválás, drag-and-drop sorrend, alkategória áthelyezése másik főkategória alá. |
 | `/settings` | Devizajelölés, hét kezdőnapja, mentés gomb oldala, adatexport (CSV), BI hozzáférés adatai, kijelentkezés. |
 
-Alsó navigációs sáv 4 elemmel: **Rögzítés · Tételek · Riportok · Beállítások**.
+Alsó navigációs sáv 5 elemmel: **Rögzítés · Tételek · Számlák · Riportok · Beállítások**. A Számlák középen, hüvelykujj-közelben van, hogy az egyenlegek és az összvagyon egyetlen koppintással elérhetők legyenek.
 
 ### 5.4 Vizuális irány
 

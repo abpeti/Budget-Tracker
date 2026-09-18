@@ -1,10 +1,11 @@
 import { NavLink } from "react-router-dom"
-import { PlusCircle, List, PieChart, Settings } from "lucide-react"
+import { PlusCircle, List, Landmark, PieChart, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
   { to: "/", label: "Rögzítés", icon: PlusCircle, end: true },
   { to: "/transactions", label: "Tételek", icon: List, end: false },
+  { to: "/accounts", label: "Számlák", icon: Landmark, end: false },
   { to: "/reports", label: "Riportok", icon: PieChart, end: false },
   { to: "/settings", label: "Beállítások", icon: Settings, end: false },
 ] as const
@@ -24,7 +25,7 @@ export function BottomNav() {
               end={end}
               className={({ isActive }) =>
                 cn(
-                  "flex min-h-12 flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium transition-colors",
+                  "flex min-h-12 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium whitespace-nowrap transition-colors",
                   isActive
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"

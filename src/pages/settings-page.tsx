@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ChevronRight, Landmark, Repeat, Shapes } from "lucide-react"
+import { ChevronRight, Repeat, Shapes } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
 import { useSavePosition } from "@/contexts/save-position-context"
@@ -34,14 +34,6 @@ export function SettingsPage() {
           <CardTitle className="text-base">Kezelés</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-1 -mt-2">
-          <Link
-            to="/accounts"
-            className="flex min-h-12 items-center gap-3 rounded-lg px-2 -mx-2 hover:bg-secondary"
-          >
-            <Landmark className="size-5 text-muted-foreground" aria-hidden="true" />
-            <span className="flex-1 font-medium">Számlák</span>
-            <ChevronRight className="size-4 text-muted-foreground" aria-hidden="true" />
-          </Link>
           <Link
             to="/categories"
             className="flex min-h-12 items-center gap-3 rounded-lg px-2 -mx-2 hover:bg-secondary"
