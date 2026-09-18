@@ -5,6 +5,7 @@ import { useTheme } from "@/contexts/theme-context"
 import { useSavePosition } from "@/contexts/save-position-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DataCard } from "@/components/settings/data-card"
 import { useDueRecurringOccurrences } from "@/lib/queries/recurring-rules"
 
 export function SettingsPage() {
@@ -98,8 +99,10 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
+      <DataCard />
+
       <p className="text-muted-foreground text-sm">
-        Devizajelölés, hét kezdőnapja, CSV export és BI hozzáférés — a
+        Devizajelölés, hét kezdőnapja és BI hozzáférés — a
         3–4. fázisban készülnek el.
       </p>
     </div>

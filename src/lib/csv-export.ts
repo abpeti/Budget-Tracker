@@ -1,7 +1,13 @@
-// CSV export a riportokhoz — UTF-8 BOM-mal (spec 7.3), hogy az Excel ne
-// rontsa el az ékezeteket. A dátumok már ISO formátumban vannak a DB-ben.
+// CSV export a riportokhoz és a teljes tranzakcióexporthoz — UTF-8 BOM-mal
+// (spec 7.3), hogy az Excel ne rontsa el az ékezeteket. A dátumok már ISO
+// formátumban vannak a DB-ben.
 
-function escapeCsvCell(value: string | number): string {
+import { downloadBlob } from "@/lib/download"
+
+export type CsvCell = string | number | null | undefined
+
+function escapeCsvCell(value: CsvCell): string {
+  if (value === null || value === undefined) return ""
   const str = String(value)
   if (/[",\r\n]/.test(str)) {
     return `"${str.replace(/"/g, '""')}"`
@@ -9,20 +15,17 @@ function escapeCsvCell(value: string | number): string {
   return str
 }
 
+/** Fejléc + sorok → CSV szöveg (CRLF sorvégekkel, BOM nélkül). */
+export function toCsvText(headers: readonly string[], rows: CsvCell[][]): string {
+  const lines = [headers, ...rows].map((row) => row.map(escapeCsvCell).join(","))
+  return lines.join("\r\n")
+}
+
 export function downloadCsv(
   filename: string,
-  headers: string[],
-  rows: (string | number)[][]
+  headers: readonly string[],
+  rows: CsvCell[][]
 ): void {
-  const lines = [headers, ...rows].map((row) => row.map(escapeCsvCell).join(","))
-  const csv = lines.join("\r\n")
-  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement("a")
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  const csv = toCsvText(headers, rows)
+  downloadBlob(filename, new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" }))
 }

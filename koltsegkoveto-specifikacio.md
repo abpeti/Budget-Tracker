@@ -244,7 +244,7 @@ Ez az app szíve. Ezt kell a legjobban megcsinálni.
 | `/reports` | Riportok (lásd 6. fejezet). |
 | `/accounts` | Számlák listája aktuális egyenleggel, összesített vagyonnal. Hozzáadás, szerkesztés, archiválás, sorrend. |
 | `/categories` | Kategóriafa. Hozzáadás, átnevezés, ikon és szín, archiválás, drag-and-drop sorrend, alkategória áthelyezése másik főkategória alá. |
-| `/settings` | Devizajelölés, hét kezdőnapja, mentés gomb oldala, adatexport (CSV), BI hozzáférés adatai, kijelentkezés. |
+| `/settings` | Devizajelölés, hét kezdőnapja, mentés gomb oldala, adatexport (CSV), biztonsági mentés és visszaállítás (JSON), BI hozzáférés adatai, kijelentkezés. |
 
 Alsó navigációs sáv 5 elemmel: **Rögzítés · Tételek · Számlák · Riportok · Beállítások**. A Számlák középen, hüvelykujj-közelben van, hogy az egyenlegek és az összvagyon egyetlen koppintással elérhetők legyenek.
 
@@ -291,9 +291,13 @@ A Supabase automatikusan publikálja a táblákat és nézeteket REST végponton
 - a szűrés, rendezés, lapozás szintaxisát,
 - **és külön hangsúlyosan azt, hogy melyik kulcsot hol szabad használni.** A `service_role` kulcs kizárólag szerveroldali vagy asztali BI eszközbe kerülhet, böngészőbe soha.
 
-### 7.3 CSV export
+### 7.3 CSV export és biztonsági mentés
 
-Az alkalmazásból egy gombnyomással letölthető teljes tranzakcióexport, a `v_transactions_flat` szerkezetében, UTF-8 BOM-mal (hogy az Excel ne rontsa el az ékezeteket) és ISO dátumformátummal.
+Az adatok soha ne ragadjanak be az appba. A Beállítások képernyő „Adataid” kártyája három műveletet ad:
+
+- **Minden tranzakció CSV-be** — egy gombnyomással letölthető teljes tranzakcióexport, a `v_transactions_flat` szerkezetében (nevekkel, nem id-kkal; előjeles összeggel; kategória-útvonallal), UTF-8 BOM-mal (hogy az Excel ne rontsa el az ékezeteket) és ISO dátumformátummal. A táblát lapozva olvassuk, hogy az 1000 soros PostgREST-limit ne csonkolja.
+- **Biztonsági mentés (JSON)** — veszteségmentes mentés minden tábláról (számlák, kategóriák, ismétlődő szabályok, tranzakciók, keretek) az eredeti id-kkal. A fájl fejléce: `format: "koltsegkoveto-backup"`, `version`, `exported_at`. A `user_id` nincs a fájlban.
+- **Visszaállítás mentésből** — a felhasználó kiválaszt egy JSON mentést; az app validálja (zod séma, formátum- és verzióellenőrzés), megerősítő dialógusban összegzi a tartalmát, majd **id szerint összefésüli** a meglévő adatokkal: a mentésben szereplő sorok felülírják az azonos id-júakat, a többi megmarad, semmi nem törlődik. Idegen kulcs szerinti sorrendben ír (számlák → fő- → alkategóriák → ismétlődő szabályok → tranzakciók → keretek), az adatbázis triggerei minden sorra lefutnak. Ugyanaz a mentés többször is visszaállítható, az eredmény ugyanaz. Használati esetek: véletlen törlés visszahozása, költözés új Supabase-projektbe.
 
 > **Megjegyzés a nézetekhez:** a `v_*` nézetek a BI szerződéses felülete. Ha később változtatod a nyers táblák szerkezetét, a nézetek maradjanak stabilak, hogy a BI riportok ne törjenek el.
 

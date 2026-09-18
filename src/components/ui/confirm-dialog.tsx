@@ -44,7 +44,7 @@ export function ConfirmDialog({
             {title}
           </DialogPrimitive.Title>
           {description && (
-            <DialogPrimitive.Description className="mt-1 text-sm text-muted-foreground">
+            <DialogPrimitive.Description className="mt-1 whitespace-pre-line text-sm text-muted-foreground">
               {description}
             </DialogPrimitive.Description>
           )}
