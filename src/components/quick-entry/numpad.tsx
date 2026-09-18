@@ -63,10 +63,14 @@ export function Numpad({
   savePosition,
   sumModeActive,
 }: NumpadProps) {
-  const rows = ROWS.map((row) => (savePosition === "left" ? [...row].reverse() : row))
+  // Balra módban a funkció-oszlop (utolsó cella) kerül a sor elejére,
+  // a számjegyek sorrendje (1-2-3) változatlan marad.
+  const rows = ROWS.map((row) =>
+    savePosition === "left" ? [row[row.length - 1], ...row.slice(0, -1)] : row
+  )
 
   return (
-    <div className="grid grid-cols-4 gap-2 p-3" dir={savePosition === "left" ? "rtl" : "ltr"}>
+    <div className="grid grid-cols-4 gap-2 p-3">
       {rows.map((row, rowIndex) =>
         row.map((cell, cellIndex) => (
           <NumpadCell
@@ -124,7 +128,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           className={cn(baseClass, "bg-secondary text-secondary-foreground hover:bg-secondary/80")}
           aria-label={`Számjegy ${cell.value}`}
           onClick={() => onDigit(cell.value!)}
@@ -136,7 +139,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           className={cn(baseClass, "bg-secondary text-secondary-foreground hover:bg-secondary/80")}
           aria-label="Tizedesvessző"
           onClick={onDecimal}
@@ -148,7 +150,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           className={cn(baseClass, "bg-secondary text-secondary-foreground hover:bg-secondary/80 text-base")}
           aria-label="Három nulla hozzáadása"
           onClick={onThousand}
@@ -160,7 +161,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           className={cn(baseClass, "bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center justify-center")}
           aria-label="Utolsó számjegy törlése"
           onClick={onBackspace}
@@ -172,7 +172,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           className={cn(
             baseClass,
             "flex items-center justify-center",
@@ -191,7 +190,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           className={cn(baseClass, "bg-secondary text-secondary-foreground hover:bg-secondary/80 text-sm px-1 truncate")}
           aria-label={`Kategória kiválasztása, jelenleg: ${categoryLabel}`}
           onClick={onOpenCategory}
@@ -203,7 +201,6 @@ function NumpadCell({
       return (
         <button
           type="button"
-          dir="ltr"
           disabled={saving}
           className={cn(
             baseClass,
