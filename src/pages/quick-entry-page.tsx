@@ -21,7 +21,7 @@ import {
 } from "@/lib/money"
 import { useSavePosition } from "@/contexts/save-position-context"
 import { DirectionSwitch } from "@/components/quick-entry/direction-switch"
-import { Numpad } from "@/components/quick-entry/numpad"
+import { Numpad, type SumOperator } from "@/components/quick-entry/numpad"
 import { FrequentCategoryChips } from "@/components/quick-entry/frequent-category-chips"
 import { CategoryPickerSheet } from "@/components/quick-entry/category-picker-sheet"
 import { AccountPickerSheet } from "@/components/quick-entry/account-picker-sheet"
@@ -43,7 +43,10 @@ export function QuickEntryPage() {
 
   const [direction, setDirection] = useState<TransactionDirection>("expense")
   const [amountRaw, setAmountRaw] = useState("0")
+  // Összeadás/kivonás mód: a már lezárt tételek előjeles fillérértékei, és a
+  // művelet, ami a most bepötyögött összegre vonatkozik.
   const [sumParts, setSumParts] = useState<number[]>([])
+  const [pendingOperator, setPendingOperator] = useState<SumOperator>("plus")
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [selectedToAccount, setSelectedToAccount] = useState<Account | null>(null)
@@ -119,6 +122,19 @@ export function QuickEntryPage() {
   }
 
   const sumTotal = sumParts.reduce((a, b) => a + b, 0)
+  const signedCents = (cents: number) => (pendingOperator === "minus" ? -cents : cents)
+
+  const handleOperator = (op: SumOperator) => {
+    const cents = parseAmountInputToCents(amountRaw)
+    if (cents > 0) {
+      setSumParts((prev) => [...prev, signedCents(cents)])
+      setAmountRaw("0")
+      setPendingOperator(op)
+    } else if (sumParts.length > 0) {
+      // Még nincs új összeg: csak a függő műveletet cseréljük (pl. + helyett −).
+      setPendingOperator(op)
+    }
+  }
 
   const showUndoToast = (id: string) => {
     setToastTxId(id)
@@ -135,9 +151,13 @@ export function QuickEntryPage() {
 
   const handleSave = async () => {
     const currentCents = parseAmountInputToCents(amountRaw)
-    const totalCents = sumTotal + currentCents
+    const totalCents = sumTotal + signedCents(currentCents)
 
-    if (totalCents <= 0) {
+    if (totalCents < 0) {
+      setError("Az összeg nem lehet negatív.")
+      return
+    }
+    if (totalCents === 0) {
       setError("Adj meg egy összeget.")
       return
     }
@@ -176,6 +196,7 @@ export function QuickEntryPage() {
 
       setAmountRaw("0")
       setSumParts([])
+      setPendingOperator("plus")
       setNote("")
       if (direction !== "transfer") {
         setSelectedCategory(null)
@@ -195,13 +216,16 @@ export function QuickEntryPage() {
 
         <div className="flex flex-col items-center gap-1 py-2 text-center">
           <p className="tabular-nums text-5xl font-semibold">
+            {sumParts.length > 0 && (
+              <span className="text-muted-foreground">{pendingOperator === "minus" ? "−" : "+"} </span>
+            )}
             {formatAmountInputDisplay(amountRaw)}{" "}
             <span className="text-2xl text-muted-foreground">Ft</span>
           </p>
 
           {sumParts.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              +{sumParts.length} tétel eddig: {formatCentsAsHuf(sumTotal)}
+              {sumParts.length} tétel eddig: {formatCentsAsHuf(sumTotal)}
             </p>
           )}
 
@@ -277,18 +301,12 @@ export function QuickEntryPage() {
           categoryLabel={selectedCategory ? categoryLabel(selectedCategory) : "nincs"}
           saving={createTransaction.isPending}
           savePosition={savePosition}
-          sumModeActive={sumParts.length > 0}
+          activeOperator={sumParts.length > 0 ? pendingOperator : null}
           onDigit={(d) => setAmountRaw((prev) => appendToAmountInput(prev, d))}
           onDecimal={() => setAmountRaw((prev) => appendDecimalPoint(prev))}
           onThousand={() => setAmountRaw((prev) => appendToAmountInput(prev, "000"))}
           onBackspace={() => setAmountRaw((prev) => backspaceAmountInput(prev))}
-          onToggleSum={() => {
-            const cents = parseAmountInputToCents(amountRaw)
-            if (cents > 0) {
-              setSumParts((prev) => [...prev, cents])
-              setAmountRaw("0")
-            }
-          }}
+          onOperator={handleOperator}
           onOpenCategory={() => setCategorySheetOpen(true)}
           onSave={() => void handleSave()}
         />

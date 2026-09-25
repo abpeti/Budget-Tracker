@@ -222,7 +222,7 @@ Ez az app szíve. Ezt kell a legjobban megcsinálni.
 ├─────────────────────────────┤
 │   1     2     3      ⌫      │
 │   4     5     6      000    │  ← saját numpad, NEM a rendszerbillentyűzet
-│   7     8     9      +      │
+│   7     8     9     + −     │
 │   .     0    Kat.   MENTÉS  │
 └─────────────────────────────┘
 ```
@@ -230,7 +230,7 @@ Ez az app szíve. Ezt kell a legjobban megcsinálni.
 **Részletek:**
 - **Saját numerikus billentyűzet**, nem `<input type="number">`. A rendszerbillentyűzet lassú, ugrál, és elveszi a képernyő felét. A saját numpad mindig ugyanott van, azonnal reagál.
 - A **`000` gomb** magyar viszonylatban aranyat ér (12 000 Ft = négy koppintás).
-- A **`+` gomb** összeadás módba vált, hogy több tétel összegét egyben lehessen bepötyögni anélkül, hogy fejben kellene számolni.
+- A **`+` és `−` gomb** összeadás/kivonás módba vált, hogy több tétel összegét egyben lehessen bepötyögni anélkül, hogy fejben kellene számolni (pl. bolti blokk mínusz egy visszavitt tétel). A művelet mindig a következő bepötyögött összegre vonatkozik; új összeg nélkül újra megnyomva csak a műveletet cseréli. Negatív végösszeg nem menthető.
 - A **gyakori kategória chipek** dinamikusak: az elmúlt 30 nap leggyakrabban használt kategóriái, használati gyakoriság szerint rendezve. Egy koppintás a chipre = kategória kiválasztva. Ez az, amitől a rögzítés 10 másodperc alá megy.
 - A **MENTÉS gomb a jobb alsó sarokban** van (jobbkezes hüvelykujjnak ez a legkönnyebb pont). Legyen beállítás a bal oldalra helyezéshez.
 - Mentés után: rövid haptikus visszajelzés (`navigator.vibrate`), toast „Rögzítve · Visszavonás" gombbal (5 másodperc), és a form azonnal ürül a következő tételhez. **Ne navigálj el máshová.**

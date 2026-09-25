@@ -1,4 +1,4 @@
-import { Delete, Plus } from "lucide-react"
+import { Delete, Minus, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface NumpadProps {
@@ -6,14 +6,17 @@ interface NumpadProps {
   onDecimal: () => void
   onThousand: () => void
   onBackspace: () => void
-  onToggleSum: () => void
+  onOperator: (op: SumOperator) => void
   onOpenCategory: () => void
   onSave: () => void
   categoryLabel: string
   saving: boolean
   savePosition: "left" | "right"
-  sumModeActive: boolean
+  /** Az éppen függő művelet (összeadás/kivonás mód), vagy null, ha nincs gyűjtés folyamatban. */
+  activeOperator: SumOperator | null
 }
+
+export type SumOperator = "plus" | "minus"
 
 type CellKind = "digit" | "decimal" | "thousand" | "backspace" | "sum" | "category" | "save"
 
@@ -40,7 +43,7 @@ const ROWS: Cell[][] = [
     { kind: "digit", label: "7", value: "7" },
     { kind: "digit", label: "8", value: "8" },
     { kind: "digit", label: "9", value: "9" },
-    { kind: "sum", label: "Összeadás" },
+    { kind: "sum", label: "Összeadás / kivonás" },
   ],
   [
     { kind: "decimal", label: "," },
@@ -55,13 +58,13 @@ export function Numpad({
   onDecimal,
   onThousand,
   onBackspace,
-  onToggleSum,
+  onOperator,
   onOpenCategory,
   onSave,
   categoryLabel,
   saving,
   savePosition,
-  sumModeActive,
+  activeOperator,
 }: NumpadProps) {
   // Balra módban a funkció-oszlop (utolsó cella) kerül a sor elejére,
   // a számjegyek sorrendje (1-2-3) változatlan marad.
@@ -77,13 +80,13 @@ export function Numpad({
             key={`${rowIndex}-${cellIndex}`}
             cell={cell}
             saving={saving}
-            sumModeActive={sumModeActive}
+            activeOperator={activeOperator}
             categoryLabel={categoryLabel}
             onDigit={onDigit}
             onDecimal={onDecimal}
             onThousand={onThousand}
             onBackspace={onBackspace}
-            onToggleSum={onToggleSum}
+            onOperator={onOperator}
             onOpenCategory={onOpenCategory}
             onSave={onSave}
           />
@@ -96,13 +99,13 @@ export function Numpad({
 function NumpadCell({
   cell,
   saving,
-  sumModeActive,
+  activeOperator,
   categoryLabel,
   onDigit,
   onDecimal,
   onThousand,
   onBackspace,
-  onToggleSum,
+  onOperator,
   onOpenCategory,
   onSave,
 }: {
@@ -110,13 +113,13 @@ function NumpadCell({
 } & Pick<
   NumpadProps,
   | "saving"
-  | "sumModeActive"
+  | "activeOperator"
   | "categoryLabel"
   | "onDigit"
   | "onDecimal"
   | "onThousand"
   | "onBackspace"
-  | "onToggleSum"
+  | "onOperator"
   | "onOpenCategory"
   | "onSave"
 >) {
@@ -168,24 +171,37 @@ function NumpadCell({
           <Delete className="size-5" aria-hidden="true" />
         </button>
       )
-    case "sum":
+    case "sum": {
+      const opClass = (op: SumOperator) =>
+        cn(
+          "h-14 flex-1 rounded-xl flex items-center justify-center transition-colors active:scale-95",
+          activeOperator === op
+            ? "bg-primary text-primary-foreground"
+            : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+        )
       return (
-        <button
-          type="button"
-          className={cn(
-            baseClass,
-            "flex items-center justify-center",
-            sumModeActive
-              ? "bg-primary text-primary-foreground"
-              : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-          )}
-          aria-label="Összeadás mód: több tétel összegzése"
-          aria-pressed={sumModeActive}
-          onClick={onToggleSum}
-        >
-          <Plus className="size-5" aria-hidden="true" />
-        </button>
+        <div className="flex w-full gap-1">
+          <button
+            type="button"
+            className={opClass("plus")}
+            aria-label="Összeadás: az aktuális tétel hozzáadása, a következő hozzáadódik"
+            aria-pressed={activeOperator === "plus"}
+            onClick={() => onOperator("plus")}
+          >
+            <Plus className="size-5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={opClass("minus")}
+            aria-label="Kivonás: az aktuális tétel hozzáadása, a következő levonódik"
+            aria-pressed={activeOperator === "minus"}
+            onClick={() => onOperator("minus")}
+          >
+            <Minus className="size-5" aria-hidden="true" />
+          </button>
+        </div>
       )
+    }
     case "category":
       return (
         <button
