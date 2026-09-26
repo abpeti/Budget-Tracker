@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
-import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { ChevronLeft } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CsvExportButton } from "@/components/reports/csv-export-button"
@@ -22,6 +22,9 @@ type Drill =
   | { level: "tx"; categoryId: string; label: string; back: Drill }
 
 const NO_CATEGORY_ID = "__none__"
+
+const hufFormatter = new Intl.NumberFormat("hu-HU")
+const formatHuf = (n: number) => hufFormatter.format(n)
 
 function bucketLabel(cat: Category | undefined) {
   return cat?.name ?? "Nincs kategória"
@@ -115,6 +118,8 @@ export function CategoryBreakdownReport({ from, to }: CategoryBreakdownReportPro
 
   const chartData = drill.level === "sub" ? subTotals : mainTotals
   const barHeight = Math.max(chartData.length * 36, 60)
+  // Room for the amount label right of the longest bar (~7px per char at 11px + label offset).
+  const labelMargin = Math.max(...chartData.map((d) => formatHuf(d.huf).length), 1) * 7 + 12
 
   const handleBarClick = (id: string) => {
     if (drill.level === "main") {
@@ -192,7 +197,7 @@ export function CategoryBreakdownReport({ from, to }: CategoryBreakdownReportPro
                 <BarChart
                   data={chartData}
                   layout="vertical"
-                  margin={{ left: 0, right: 48, top: 4, bottom: 4 }}
+                  margin={{ left: 0, right: labelMargin, top: 4, bottom: 4 }}
                 >
                   <XAxis type="number" hide />
                   <YAxis
@@ -202,16 +207,6 @@ export function CategoryBreakdownReport({ from, to }: CategoryBreakdownReportPro
                     tick={{ fontSize: 12, fill: "var(--color-foreground)" }}
                     axisLine={false}
                     tickLine={false}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "var(--color-secondary)" }}
-                    contentStyle={{
-                      background: "var(--color-card)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: 8,
-                      fontSize: 12,
-                    }}
-                    formatter={(v) => [`${new Intl.NumberFormat("hu-HU").format(Number(v ?? 0))} Ft`, "Összeg"]}
                   />
                   <Bar
                     dataKey="huf"
@@ -226,7 +221,7 @@ export function CategoryBreakdownReport({ from, to }: CategoryBreakdownReportPro
                     <LabelList
                       dataKey="huf"
                       position="right"
-                      formatter={(v) => new Intl.NumberFormat("hu-HU").format(Number(v ?? 0))}
+                      formatter={(v) => formatHuf(Number(v ?? 0))}
                       style={{ fill: "var(--color-muted-foreground)", fontSize: 11 }}
                     />
                   </Bar>
