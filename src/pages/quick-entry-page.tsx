@@ -15,8 +15,8 @@ import {
   appendToAmountInput,
   backspaceAmountInput,
   centsToAmount,
+  centsToDecimalString,
   formatAmountInputDisplay,
-  formatCentsAsHuf,
   parseAmountInputToCents,
 } from "@/lib/money"
 import { useSavePosition } from "@/contexts/save-position-context"
@@ -121,8 +121,16 @@ export function QuickEntryPage() {
     setAccountTouched(true)
   }
 
-  const sumTotal = sumParts.reduce((a, b) => a + b, 0)
   const signedCents = (cents: number) => (pendingOperator === "minus" ? -cents : cents)
+  const currentCents = parseAmountInputToCents(amountRaw)
+  // Élő kifejezés: a lezárt tételek + a most gépelt összeg (ha van), és a végeredmény.
+  const sumTerms = currentCents > 0 ? [...sumParts, signedCents(currentCents)] : sumParts
+  const totalCents = sumTerms.reduce((a, b) => a + b, 0)
+  const formatTerm = (cents: number) =>
+    formatAmountInputDisplay(centsToDecimalString(Math.abs(cents)).replace(/\.00$/, ""))
+  const sumExpression = sumTerms
+    .map((c, i) => (c < 0 ? (i === 0 ? "−" : " − ") : i === 0 ? "" : " + ") + formatTerm(c))
+    .join("")
 
   const handleOperator = (op: SumOperator) => {
     const cents = parseAmountInputToCents(amountRaw)
@@ -150,9 +158,6 @@ export function QuickEntryPage() {
   }
 
   const handleSave = async () => {
-    const currentCents = parseAmountInputToCents(amountRaw)
-    const totalCents = sumTotal + signedCents(currentCents)
-
     if (totalCents < 0) {
       setError("Az összeg nem lehet negatív.")
       return
@@ -224,8 +229,12 @@ export function QuickEntryPage() {
           </p>
 
           {sumParts.length > 0 && (
-            <p className="text-sm text-muted-foreground">
-              {sumParts.length} tétel eddig: {formatCentsAsHuf(sumTotal)}
+            <p className="max-w-full break-words text-sm tabular-nums text-muted-foreground">
+              {sumTerms.length > 1 && <>{sumExpression} = </>}
+              <span className={totalCents < 0 ? "font-semibold text-destructive" : "font-semibold text-foreground"}>
+                {totalCents < 0 ? "−" : ""}
+                {formatTerm(totalCents)} Ft
+              </span>
             </p>
           )}
 
